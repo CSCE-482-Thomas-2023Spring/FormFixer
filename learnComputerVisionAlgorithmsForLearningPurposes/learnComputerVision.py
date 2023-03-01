@@ -3,6 +3,7 @@ import numpy as np
 import mediapipe as mp
 import time
 import argparse
+import math
 # ###Lesson 1 Reading and writing an image
 
 # img_grayscale = cv2.imread("test.jpg",0) #0 flag means read image in grayscale mode
@@ -414,6 +415,8 @@ def jointTracker():
                 fps = 1 / (cTime - pTime)
                 pTime = cTime
 
+                # This would print the angle between the given body joints
+                # print(getAngle("left_elbow", "left_shoulder", "nose", keypoints))
                 out.write(img)
                 cv2.imshow("Image", img)
                 cv2.waitKey(1)
@@ -423,6 +426,37 @@ def jointTracker():
         cv2.destroyAllWindows()
 
 
+
+def calculateAngle(joint1, joint2, joint3):
+    # Get x, y coordinates of joints
+    x1, y1 = joint1['X'], joint1['Y']
+    x2, y2 = joint2['X'], joint2['Y']
+    x3, y3 = joint3['X'], joint3['Y']
+
+    # Calculate angle between three points using dot product
+    # and arccosine formula
+    a = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    b = math.sqrt((x2 - x3)**2 + (y2 - y3)**2)
+    c = math.sqrt((x3 - x1)**2 + (y3 - y1)**2)
+    angle = math.degrees(math.acos((a**2 + b**2 - c**2) / (2 * a * b)))
+
+    return angle
+
+
+def getAngle(jointName1, jointName2, jointName3, keypoints):
+    keypointNames = ["nose","left_eye_inner","left_eye","left_eye_outer","right_eye_inner","right_eye","right_eye_outer","left_ear","right_ear","mouth_left","mouth_right","left_shoulder","right_shoulder","left_elbow","right_elbow","left_wrist","right_wrist","left_pinky","right_pinky","left_index","right_index","left_thumb","right_thumb","left_hip","right_hip","left_knee","right_knee","left_ankle","right_ankle","left_heel","right_heel","left_foot_index","right_foot_index"]
+    jointIndex1 = keypointNames.index(jointName1)
+    jointIndex2 = keypointNames.index(jointName2)
+    jointIndex3 = keypointNames.index(jointName3)
+
+    joint1 = keypoints[jointIndex1]
+    joint2 = keypoints[jointIndex2]
+    joint3 = keypoints[jointIndex3]
+
+
+    angle = calculateAngle(joint1, joint2, joint3)
+
+    return angle
 
         
 def test4():
