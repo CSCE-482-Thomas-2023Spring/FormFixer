@@ -2,6 +2,8 @@
 import tkinter
 import tkinter.messagebox
 import customtkinter
+import numpy as np
+import cv2
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -12,7 +14,7 @@ class App(customtkinter.CTk):
         super().__init__()
 
         # configure window
-        self.title("CustomTkinter complex_example.py")
+        self.title("We the Best.py")
         self.geometry(f"{1100}x{580}")
 
         # configure grid layout (4x4)
@@ -28,9 +30,9 @@ class App(customtkinter.CTk):
         self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
         self.logo_label_select_workout = customtkinter.CTkLabel(self.sidebar_frame, text="Select your workout", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.logo_label_select_workout.grid(row=1, column=0, padx=20, pady=(20, 10))
-        self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, command=self.sidebar_button_event, text="Squat")
+        self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, command=self.open_webcam, text="Squat")
         self.sidebar_button_1.grid(row=2, column=0, padx=20, pady=10)
-        self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, command=self.sidebar_button_event, text="Deadlift")
+        self.sidebar_button_2 = customtkinter.CTkButton(self.sidebar_frame, command=self.open_webcam, text="Deadlift")
         self.sidebar_button_2.grid(row=3, column=0, padx=20, pady=10)
         # self.sidebar_button_3 = customtkinter.CTkButton(self.sidebar_frame, command=self.sidebar_button_event)
         # self.sidebar_button_3.grid(row=3, column=0, padx=20, pady=10)
@@ -160,6 +162,15 @@ class App(customtkinter.CTk):
 
     def sidebar_button_event(self):
         print("sidebar_button click")
+    def open_webcam(self):
+        cap = cv2.VideoCapture(0)
+        while True:
+            ret, frame = cap.read()
+            cv2.imshow('frame', frame)
+            if cv2.waitKey(1) == ord('q'):
+                break
+        cap.release()
+        cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
