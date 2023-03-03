@@ -4,12 +4,29 @@ import tkinter.messagebox
 import customtkinter
 import numpy as np
 import cv2
+import os
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
 
 class App(customtkinter.CTk):
+    STD_DIMENSIONS = {
+        "480p": (640, 480),
+        "720p": (1280, 720),
+        "1080p": (1920, 1080),
+        "4k": (3840, 2160),
+    }
+    
+    VIDEO_TYPE = {
+        'avi': cv2.VideoWriter_fourcc(*'XVID'),
+        'mp4': cv2.VideoWriter_fourcc(*'XVID'),
+    }
+    
+    filename = 'video.mp4'
+    frames_per_second = 24.0
+    my_res = '720p'
+    
     def __init__(self):
         super().__init__()
 
@@ -162,14 +179,37 @@ class App(customtkinter.CTk):
 
     def sidebar_button_event(self):
         print("sidebar_button click")
+        
+    def change_res(self, cap, width, height):
+        cap.set(3, width)
+        cap.set(4, height)
+    
+    def get_dims(self, cap, res='1080p'):
+        width, height = self.STD_DIMENSIONS['480p']
+        if res in self.STD_DIMENSIONS:
+            width, height = self.STD_DIMENSIONS[res]
+        self.change_res(cap, width, height)
+        
+        return width, height
+    def get_video_type(self, filename):
+        filename, ext = os.path.splitext(filename)
+        if ext in self.VIDEO_TYPE:
+            return self.VIDEO_TYPE[ext]
+        return self.VIDEO_TYPE['avi']
+
     def open_webcam(self):
         cap = cv2.VideoCapture(0)
+        dims = self.get_dims(cap, res=self.my_res)
+        video_type_cv2 = self.get_video_type(self.filename)
+        
+        out = cv2.VideoWriter(self.filename, video_type_cv2, self.frames_per_second, dims)
         while True:
             ret, frame = cap.read()
             cv2.imshow('frame', frame)
-            if cv2.waitKey(1) == ord('q'):
+            if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
         cap.release()
+        out.release()
         cv2.destroyAllWindows()
 
 
